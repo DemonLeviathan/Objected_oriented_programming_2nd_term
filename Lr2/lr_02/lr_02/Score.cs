@@ -11,14 +11,19 @@ namespace lr_02
     internal class Score
     {
         [JsonProperty("scorenum")]
+        [JsonRequired]
         public int number { get; set; }
         [JsonProperty("type")]
+        [JsonRequired]
         public string contributionType { get; set; }
         [JsonProperty("date")]
+        [JsonRequired]
         public string openDate { get; set; }
         [JsonProperty("sms")]
+        [JsonRequired]
         public bool getSMS { get; set; }
         [JsonProperty("connection")]
+        [JsonRequired]
         public bool connectIB { get; set; }
 
         //[JsonConstructor]

@@ -1,1 +1,58 @@
-{"name":"dsfhsdfh","surname":"shgfdfh","lastName":"dsfhsdh","birthday":"2023-03-17","passportNumber":"sd4354674"}
+[
+  {
+    "score": {
+      "scorenum": 4849849,
+      "type": "Low termin",
+      "date": "2023-03-17",
+      "sms": true,
+      "connection": false
+    },
+    "name": "ergere",
+    "surname": "areg",
+    "lastName": "",
+    "birthday": "2023-03-17",
+    "passportNumber": "ea7486516"
+  },
+  {
+    "score": {
+      "scorenum": 3454567,
+      "type": "Low termin",
+      "date": "2023-03-01",
+      "sms": true,
+      "connection": false
+    },
+    "name": "dfghj",
+    "surname": "dfgh-fgh",
+    "lastName": "",
+    "birthday": "2023-03-02",
+    "passportNumber": "fg6766767"
+  },
+  {
+    "score": {
+      "scorenum": 7198798,
+      "type": "Long termin",
+      "date": "2023-03-01",
+      "sms": true,
+      "connection": false
+    },
+    "name": "ethehty",
+    "surname": "fghj",
+    "lastName": "hstrh",
+    "birthday": "2023-03-03",
+    "passportNumber": "tr1897897"
+  },
+  {
+    "score": {
+      "scorenum": 7897918,
+      "type": "Low termin",
+      "date": "2023-01-12",
+      "sms": true,
+      "connection": false
+    },
+    "name": "reaer",
+    "surname": "rtsgar",
+    "lastName": "iutu",
+    "birthday": "2023-01-10",
+    "passportNumber": "hs7878917"
+  }
+]

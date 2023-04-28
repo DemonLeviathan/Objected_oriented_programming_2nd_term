@@ -56,8 +56,18 @@
             errorNumber = new ErrorProvider(components);
             comboBox1 = new ComboBox();
             ContributionType = new Label();
+            Menu = new GroupBox();
+            searchTextBox = new TextBox();
+            listSort = new ComboBox();
+            listSearch = new ComboBox();
+            About = new Button();
+            Saveresult = new Button();
+            Sortby = new Button();
+            Search = new Button();
+            richTextBox2 = new RichTextBox();
             ((System.ComponentModel.ISupportInitialize)errorData).BeginInit();
             ((System.ComponentModel.ISupportInitialize)errorNumber).BeginInit();
+            Menu.SuspendLayout();
             SuspendLayout();
             // 
             // Surname
@@ -229,7 +239,7 @@
             // 
             // SaveInfo
             // 
-            SaveInfo.Location = new Point(471, 256);
+            SaveInfo.Location = new Point(471, 260);
             SaveInfo.Name = "SaveInfo";
             SaveInfo.Size = new Size(94, 29);
             SaveInfo.TabIndex = 23;
@@ -292,11 +302,100 @@
             ContributionType.TabIndex = 29;
             ContributionType.Text = "ContributionType";
             // 
+            // Menu
+            // 
+            Menu.Controls.Add(searchTextBox);
+            Menu.Controls.Add(listSort);
+            Menu.Controls.Add(listSearch);
+            Menu.Controls.Add(About);
+            Menu.Controls.Add(Saveresult);
+            Menu.Controls.Add(Sortby);
+            Menu.Controls.Add(Search);
+            Menu.Location = new Point(248, 371);
+            Menu.Name = "Menu";
+            Menu.Size = new Size(317, 236);
+            Menu.TabIndex = 30;
+            Menu.TabStop = false;
+            Menu.Text = "Menu";
+            // 
+            // searchTextBox
+            // 
+            searchTextBox.Location = new Point(134, 63);
+            searchTextBox.Name = "searchTextBox";
+            searchTextBox.Size = new Size(152, 27);
+            searchTextBox.TabIndex = 6;
+            searchTextBox.KeyPress += searchTextBox_KeyPress;
+            // 
+            // listSort
+            // 
+            listSort.FormattingEnabled = true;
+            listSort.Location = new Point(134, 113);
+            listSort.Name = "listSort";
+            listSort.Size = new Size(152, 28);
+            listSort.TabIndex = 5;
+            // 
+            // listSearch
+            // 
+            listSearch.FormattingEnabled = true;
+            listSearch.Location = new Point(134, 29);
+            listSearch.Name = "listSearch";
+            listSearch.Size = new Size(152, 28);
+            listSearch.TabIndex = 4;
+            listSearch.SelectedIndexChanged += listSearch_SelectedIndexChanged;
+            // 
+            // About
+            // 
+            About.Location = new Point(152, 201);
+            About.Name = "About";
+            About.Size = new Size(134, 29);
+            About.TabIndex = 3;
+            About.Text = "About programm";
+            About.UseVisualStyleBackColor = true;
+            // 
+            // Saveresult
+            // 
+            Saveresult.Location = new Point(10, 201);
+            Saveresult.Name = "Saveresult";
+            Saveresult.Size = new Size(94, 29);
+            Saveresult.TabIndex = 2;
+            Saveresult.Text = "Save result";
+            Saveresult.UseVisualStyleBackColor = true;
+            // 
+            // Sortby
+            // 
+            Sortby.Location = new Point(10, 112);
+            Sortby.Name = "Sortby";
+            Sortby.Size = new Size(94, 29);
+            Sortby.TabIndex = 1;
+            Sortby.Text = "Sort by";
+            Sortby.UseVisualStyleBackColor = true;
+            Sortby.Click += Sortby_Click;
+            // 
+            // Search
+            // 
+            Search.Location = new Point(10, 29);
+            Search.Name = "Search";
+            Search.Size = new Size(94, 29);
+            Search.TabIndex = 0;
+            Search.Text = "Search";
+            Search.UseVisualStyleBackColor = true;
+            Search.Click += Search_Click;
+            // 
+            // richTextBox2
+            // 
+            richTextBox2.Location = new Point(594, 371);
+            richTextBox2.Name = "richTextBox2";
+            richTextBox2.Size = new Size(317, 236);
+            richTextBox2.TabIndex = 31;
+            richTextBox2.Text = "";
+            // 
             // Bank
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(1016, 760);
+            Controls.Add(richTextBox2);
+            Controls.Add(Menu);
             Controls.Add(ContributionType);
             Controls.Add(comboBox1);
             Controls.Add(OwnersName);
@@ -327,6 +426,8 @@
             Load += Bank_Load;
             ((System.ComponentModel.ISupportInitialize)errorData).EndInit();
             ((System.ComponentModel.ISupportInitialize)errorNumber).EndInit();
+            Menu.ResumeLayout(false);
+            Menu.PerformLayout();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -360,5 +461,14 @@
         private ErrorProvider errorNumber;
         private Label ContributionType;
         private ComboBox comboBox1;
+        private RichTextBox richTextBox2;
+        private GroupBox Menu;
+        private ComboBox listSort;
+        private ComboBox listSearch;
+        private Button About;
+        private Button Saveresult;
+        private Button Sortby;
+        private Button Search;
+        private TextBox searchTextBox;
     }
 }

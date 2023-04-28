@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Text;
 using System.Text.RegularExpressions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -8,6 +10,7 @@ namespace lr_02
     {
         private Owner owner;
         private Binder binder;
+        List<Owner> list = new List<Owner>();
 
 
         public Bank()
@@ -20,7 +23,13 @@ namespace lr_02
             passportNum.Validating += passportNum_Validating;
             writePhoneNum.Validating += writePhoneNum_Validating;
             enterScoreNum.Validating += enterScoreNum_Validating;
-            SaveInfo.Click += SaveInfo_Click;
+            string jsonPath = "Owner.json";
+            string json = File.ReadAllText(jsonPath);
+
+            if (JsonConvert.DeserializeObject<List<Owner>>(json) != null)
+                list = JsonConvert.DeserializeObject<List<Owner>>(json);
+
+            /* SaveInfo.Click += SaveInfo_Click;*/
         }
 
         private void Surname_Click(object sender, EventArgs e)
@@ -36,10 +45,10 @@ namespace lr_02
         private void writeSurname_KeyPress(object sender, KeyPressEventArgs e)
         {
             char keyChar = e.KeyChar;
-            if (!Char.IsLetter(keyChar) && e.KeyChar != (char)Keys.Back)
+            if (!Char.IsLetter(keyChar) && e.KeyChar != (char)Keys.Back && keyChar != '-')
             {
                 e.Handled = true;
-                MessageBox.Show("Surname can't contains symbols instead letters");
+                MessageBox.Show("Surname can't contains symbols instead letters and -");
             }
         }
 
@@ -135,7 +144,6 @@ namespace lr_02
             }
 
             string text = enterScoreNum.Text;
-            //text = text.Replace(" ", "");
 
             if (text.Length > 6 && e.KeyChar != (char)Keys.Back)
             {
@@ -205,11 +213,12 @@ namespace lr_02
 
         private void enterScoreNum_Validating(object? sender, EventArgs e)
         {
+            string text = enterScoreNum.Text;
             if (String.IsNullOrEmpty(enterScoreNum.Text))
             {
                 errorNumber.SetError(enterScoreNum, "Score number must be inputted");
             }
-            else if (enterScoreNum.ToString().Length != 7)
+            else if (text.Length != 7)
             {
                 errorNumber.SetError(enterScoreNum, "Score number must contains 7 digits");
             }
@@ -226,10 +235,30 @@ namespace lr_02
             {
                 Score score = new Score(Int32.Parse(enterScoreNum.Text), comboBox1.SelectedItem.ToString(), monthCalendar1.SelectionStart.ToString("yyyy-MM-dd"), checkBox1.Checked, checkBox2.Checked);
                 Owner owner = new Owner(writeSurname.Text, writeName.Text, writeLastName.Text, dateTimePicker1.Value.ToString("yyyy-MM-dd"), passportNum.Text, score);
+                var jsonPath = "Owner.json";
+                list.Add(owner);
+                var json = JsonConvert.SerializeObject(list, Formatting.Indented);
+                byte[] bytes = Encoding.UTF8.GetBytes(json);
 
-                string json = JsonConvert.SerializeObject(owner);
-                var jsonPath = "D:\\Univer\\4-th term\\Labs C#\\Lr2\\lr_02\\lr_02\\Owner.json";
-                File.WriteAllText(jsonPath, json);
+                using (FileStream stream = new FileStream(jsonPath, FileMode.OpenOrCreate))
+                {
+                    stream.Write(bytes, 0, bytes.Length);
+                }
+                /*var txt = File.ReadAllText(jsonPath);
+                
+                owners.Add(owner);
+                */
+                /*File.WriteAllText(jsonPath, json);
+                List<Owner> owners = JsonConvert.SerializeObject<List<Owner>>();
+                ;*/
+                //var json = JsonConvert.SerializeObject(owner, Formatting.Indented);
+
+
+
+                //string json = File.ReadAllText(jsonPath);
+                //JObject jsonObject = JObject.Parse(json);
+
+                //jsonObject.Add(owner.ToString(), owner);
             }
             catch (Exception ex)
             {
@@ -242,22 +271,28 @@ namespace lr_02
         {
             try
             {
-                var jsonPath = "D:\\Univer\\4-th term\\Labs C#\\Lr2\\lr_02\\lr_02\\Owner.json";
+                string jsonPath = "Owner.json";
                 string json = File.ReadAllText(jsonPath);
+
+                List<Owner> ownerList = JsonConvert.DeserializeObject<List<Owner>>(json);
                 richTextBox1.Clear();
-
-                Owner owner = JsonConvert.DeserializeObject<Owner>(json);
-
-                richTextBox1.AppendText($"Surname: {owner.surname}\n");
-                richTextBox1.AppendText($"Name: {owner.name}\n");
-                richTextBox1.AppendText($"Patronimic: {owner.lastName} \n");
-                richTextBox1.AppendText($"Birthday: {owner.birthday}\n");
-                richTextBox1.AppendText($"Passport number: {owner.passportNumber} \n");
-                richTextBox1.AppendText($"Score number: {owner.score.number} \n");
-                richTextBox1.AppendText($"Contrubution type: {owner.score.contributionType} \n");
-                richTextBox1.AppendText($"Open date: {owner.score.openDate} \n");
-                richTextBox1.AppendText($"Need to get SMS: {owner.score.getSMS} \n");
-                richTextBox1.AppendText($"Need to connect IB: {owner.score.connectIB} \n");
+                if (ownerList != null)
+                {
+                    foreach (var owner in ownerList)
+                    {
+                        richTextBox1.AppendText($"Surname: {owner.surname}\n");
+                        richTextBox1.AppendText($"Name: {owner.name}\n");
+                        richTextBox1.AppendText($"Patronimic: {owner.lastName} \n");
+                        richTextBox1.AppendText($"Birthday: {owner.birthday}\n");
+                        richTextBox1.AppendText($"Passport number: {owner.passportNumber} \n");
+                        richTextBox1.AppendText($"Score number: {owner.score.number} \n");
+                        richTextBox1.AppendText($"Contrubution type: {owner.score.contributionType} \n");
+                        richTextBox1.AppendText($"Open date: {owner.score.openDate} \n");
+                        richTextBox1.AppendText($"Need to get SMS: {owner.score.getSMS} \n");
+                        richTextBox1.AppendText($"Need to connect IB: {owner.score.connectIB} \n");
+                        richTextBox1.AppendText("\n");
+                    }
+                }
             }
             catch (Exception ex)
             {
@@ -275,6 +310,262 @@ namespace lr_02
         {
             comboBox1.Items.Add("Low termin");
             comboBox1.Items.Add("Long termin");
+            listSearch.Items.Add("by passport number");
+            listSearch.Items.Add("by full name");
+            listSearch.Items.Add("by score number");
+            listSearch.Items.Add("by contridution type");
+            listSort.Items.Add("by contribution type");
+            listSort.Items.Add("by open date");
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                Score score = new Score(Int32.Parse(enterScoreNum.Text), comboBox1.SelectedItem.ToString(), monthCalendar1.SelectionStart.ToString("yyyy-MM-dd"), checkBox1.Checked, checkBox2.Checked);
+                Owner owner = new Owner(writeSurname.Text, writeName.Text, writeLastName.Text, dateTimePicker1.Value.ToString("yyyy-MM-dd"), passportNum.Text, score);
+                var jsonPath = "Owner.json";
+                list.Add(owner);
+                var json = JsonConvert.SerializeObject(list, Formatting.Indented);
+                byte[] bytes = Encoding.UTF8.GetBytes(json);
+
+                using (FileStream stream = new FileStream(jsonPath, FileMode.OpenOrCreate))
+                {
+                    stream.Write(bytes, 0, bytes.Length);
+                }
+
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+
+        private void listSearch_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void Search_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                richTextBox2.Clear();
+                if (searchTextBox.Text == "")
+                {
+                    throw new Exception("Empty textbox.");
+                }
+                else if (listSearch.Text == "by passport number")
+                {
+                    Regex regex = new Regex(searchTextBox.Text, RegexOptions.IgnoreCase);
+                    richTextBox2.AppendText("Result of searching by passport number: \n\n");
+                    foreach (Owner owner in list)
+                    {
+                        if (regex.IsMatch(owner.passportNumber))
+                        {
+                            richTextBox2.AppendText($"Surname: {owner.surname}\n");
+                            richTextBox2.AppendText($"Name: {owner.name}\n");
+                            richTextBox2.AppendText($"Patronimic: {owner.lastName} \n");
+                            richTextBox2.AppendText($"Birthday: {owner.birthday}\n");
+                            richTextBox2.AppendText($"Passport number: {owner.passportNumber} \n");
+                            richTextBox2.AppendText($"Score number: {owner.score.number} \n");
+                            richTextBox2.AppendText($"Contrubution type: {owner.score.contributionType} \n");
+                            richTextBox2.AppendText($"Open date: {owner.score.openDate} \n");
+                            richTextBox2.AppendText($"Need to get SMS: {owner.score.getSMS} \n");
+                            richTextBox2.AppendText($"Need to connect IB: {owner.score.connectIB} \n");
+                            richTextBox2.AppendText("\n");
+                        }
+                    }
+                    richTextBox2.AppendText("-------------------------------------\n");
+                }
+                else if (listSearch.Text == "by full name")
+                {
+                    Regex regex = new Regex(searchTextBox.Text, RegexOptions.IgnoreCase);
+                    richTextBox2.AppendText("Result of searching by full name: \n\n");
+                    foreach (Owner owner in list)
+                    {
+                        if (regex.IsMatch(owner.surname) || regex.IsMatch(owner.name) || regex.IsMatch(owner.lastName))
+                        {
+                            richTextBox2.AppendText($"Surname: {owner.surname}\n");
+                            richTextBox2.AppendText($"Name: {owner.name}\n");
+                            richTextBox2.AppendText($"Patronimic: {owner.lastName} \n");
+                            richTextBox2.AppendText($"Birthday: {owner.birthday}\n");
+                            richTextBox2.AppendText($"Passport number: {owner.passportNumber} \n");
+                            richTextBox2.AppendText($"Score number: {owner.score.number} \n");
+                            richTextBox2.AppendText($"Contrubution type: {owner.score.contributionType} \n");
+                            richTextBox2.AppendText($"Open date: {owner.score.openDate} \n");
+                            richTextBox2.AppendText($"Need to get SMS: {owner.score.getSMS} \n");
+                            richTextBox2.AppendText($"Need to connect IB: {owner.score.connectIB} \n");
+                            richTextBox2.AppendText("\n");
+                        }
+                    }
+                    richTextBox2.AppendText("-------------------------------------\n");
+                }
+                else if (listSearch.Text == "by score number")
+                {
+                    Regex regex = new Regex(searchTextBox.Text, RegexOptions.IgnoreCase);
+                    richTextBox2.AppendText("Result of searching by score number: \n\n");
+                    foreach (Owner owner in list)
+                    {
+                        if (regex.IsMatch(owner.score.number.ToString()))
+                        {
+                            richTextBox2.AppendText($"Surname: {owner.surname}\n");
+                            richTextBox2.AppendText($"Name: {owner.name}\n");
+                            richTextBox2.AppendText($"Patronimic: {owner.lastName} \n");
+                            richTextBox2.AppendText($"Birthday: {owner.birthday}\n");
+                            richTextBox2.AppendText($"Passport number: {owner.passportNumber} \n");
+                            richTextBox2.AppendText($"Score number: {owner.score.number} \n");
+                            richTextBox2.AppendText($"Contrubution type: {owner.score.contributionType} \n");
+                            richTextBox2.AppendText($"Open date: {owner.score.openDate} \n");
+                            richTextBox2.AppendText($"Need to get SMS: {owner.score.getSMS} \n");
+                            richTextBox2.AppendText($"Need to connect IB: {owner.score.connectIB} \n");
+                            richTextBox2.AppendText("\n");
+                        }
+                        else
+                        {
+                            richTextBox2.AppendText("No matches\n");
+                            break;
+                        }
+                    }
+
+                    richTextBox2.AppendText("-------------------------------------\n");
+
+                }
+                else if (listSearch.Text == "by contridution type")
+                {
+                    Regex regex = new Regex(searchTextBox.Text, RegexOptions.IgnoreCase);
+                    richTextBox2.AppendText("Result of searching by contribution type: \n\n");
+                    foreach (Owner owner in list)
+                    {
+                        if (regex.IsMatch(owner.score.contributionType.ToString()))
+                        {
+                            richTextBox2.AppendText($"Surname: {owner.surname}\n");
+                            richTextBox2.AppendText($"Name: {owner.name}\n");
+                            richTextBox2.AppendText($"Patronimic: {owner.lastName} \n");
+                            richTextBox2.AppendText($"Birthday: {owner.birthday}\n");
+                            richTextBox2.AppendText($"Passport number: {owner.passportNumber} \n");
+                            richTextBox2.AppendText($"Score number: {owner.score.number} \n");
+                            richTextBox2.AppendText($"Contrubution type: {owner.score.contributionType} \n");
+                            richTextBox2.AppendText($"Open date: {owner.score.openDate} \n");
+                            richTextBox2.AppendText($"Need to get SMS: {owner.score.getSMS} \n");
+                            richTextBox2.AppendText($"Need to connect IB: {owner.score.connectIB} \n");
+                            richTextBox2.AppendText("\n");
+                        }
+                    }
+                    if (!regex.IsMatch(owner.score.contributionType.ToString()))
+                    {
+                        richTextBox2.AppendText("No matches");
+                    }
+                    richTextBox2.AppendText("-------------------------------------\n");
+                }
+
+                else
+                {
+                    throw new Exception("No search parameter.");
+                }
+                searchTextBox.Clear();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("You can't search without parameters");
+            }
+        }
+
+        private void searchTextBox_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (listSearch.Text == "by passport number")
+            {
+                char keyChar = e.KeyChar;
+
+                if (!Char.IsLetterOrDigit(keyChar) && e.KeyChar != (char)Keys.Back)
+                {
+                    e.Handled = true;
+                    return;
+                }
+            }
+            // searchTextBox
+            else if (listSearch.Text == "by full name")
+            {
+                char keyChar = e.KeyChar;
+                if (!Char.IsLetter(keyChar) && e.KeyChar != (char)Keys.Back && keyChar != '-')
+                {
+                    e.Handled = true;
+                    return;
+                }
+            }
+            else if (listSearch.Text == "by score number")
+            {
+                char keyChar = e.KeyChar;
+
+                if (!Char.IsDigit(keyChar) && e.KeyChar != (char)Keys.Back)
+                {
+                    e.Handled = true;
+                    return;
+                }
+            }
+            else if (listSearch.Text == "by contridution type")
+            {
+                char keyChar = e.KeyChar;
+
+                if (!Char.IsLetter(keyChar) && e.KeyChar != (char)Keys.Back)
+                {
+                    e.Handled = true;
+                }
+            }
+        }
+
+        private void Sortby_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                richTextBox2.Clear();
+                if (listSort.Text == "by contribution type")
+                {
+                    var sortbytype = list.OrderBy(s => s.score.contributionType.ToString());
+                    foreach (Owner owner in list)
+                    {
+                        richTextBox2.AppendText($"Surname: {owner.surname}\n");
+                        richTextBox2.AppendText($"Name: {owner.name}\n");
+                        richTextBox2.AppendText($"Patronimic: {owner.lastName} \n");
+                        richTextBox2.AppendText($"Birthday: {owner.birthday}\n");
+                        richTextBox2.AppendText($"Passport number: {owner.passportNumber} \n");
+                        richTextBox2.AppendText($"Score number: {owner.score.number} \n");
+                        richTextBox2.AppendText($"Contrubution type: {owner.score.contributionType} \n");
+                        richTextBox2.AppendText($"Open date: {owner.score.openDate} \n");
+                        richTextBox2.AppendText($"Need to get SMS: {owner.score.getSMS} \n");
+                        richTextBox2.AppendText($"Need to connect IB: {owner.score.connectIB} \n");
+                        richTextBox2.AppendText("\n");
+
+                    }
+                }
+                else if (listSort.Text == "by open date")
+                {
+                    var sortbydate = list.OrderBy(s => s.score.openDate.ToString());
+                    foreach (Owner owner in list)
+                    {
+                        richTextBox2.AppendText($"Surname: {owner.surname}\n");
+                        richTextBox2.AppendText($"Name: {owner.name}\n");
+                        richTextBox2.AppendText($"Patronimic: {owner.lastName} \n");
+                        richTextBox2.AppendText($"Birthday: {owner.birthday}\n");
+                        richTextBox2.AppendText($"Passport number: {owner.passportNumber} \n");
+                        richTextBox2.AppendText($"Score number: {owner.score.number} \n");
+                        richTextBox2.AppendText($"Contrubution type: {owner.score.contributionType} \n");
+                        richTextBox2.AppendText($"Open date: {owner.score.openDate} \n");
+                        richTextBox2.AppendText($"Need to get SMS: {owner.score.getSMS} \n");
+                        richTextBox2.AppendText($"Need to connect IB: {owner.score.connectIB} \n");
+                        richTextBox2.AppendText("\n");
+
+                    }
+                }
+                else
+                {
+                    throw new Exception("You can't sort without parameters");
+                }
+            }
+            catch (Exception ex) 
+            {
+
+            }
         }
     }
 }
